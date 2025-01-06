@@ -91,9 +91,13 @@ loader.load(
   (gltf) => {
     model = gltf.scene; // Store the loaded model
     model.scale.set(0.2, 0.2, 0.2); // Set initial scale
+     alert("Success");
+ 
   },
   undefined,
   (error) => {
+     alert("Failed to load the 3D model. Please check the file URL or your internet connection.");
+ 
     console.error("Error loading GLTF model:", error);
   }
 );
