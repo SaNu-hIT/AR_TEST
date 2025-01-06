@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
   </head>
 
   <body>
@@ -20,13 +21,15 @@
       let camera, scene, renderer;
       let reticle;
       let controller;
+      let loader;
+      let model;
       init();
       animate();
 
       function init() {
         container = document.createElement("div");
         document.body.appendChild(container);
-
+        loader = new THREE.GLTFLoader();
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(
@@ -61,6 +64,9 @@
         window.addEventListener("resize", onWindowResize, false);
       }
 
+
+
+
       function addReticleToScene() {
         const geometry = new THREE.RingBufferGeometry(0.15, 0.2, 32).rotateX(
           -Math.PI / 2
@@ -82,22 +88,53 @@
 
 
 
-    function onSelect() {        
-        if (reticle.visible) {
-          // cone added at the point of a hit test
-          // replace the next lines to add your own object in space
-          const geometry = new THREE.CylinderBufferGeometry(0, 0.05, 0.2, 32);
-          const material = new THREE.MeshPhongMaterial({
-            color: 0xffffff * Math.random()
-          });
-          const mesh = new THREE.Mesh(geometry, material);
-          
-          // set the position of the cylinder based on where the reticle is          
-          mesh.position.setFromMatrixPosition(reticle.matrix);
-          mesh.quaternion.setFromRotationMatrix(reticle.matrix);
 
-          scene.add(mesh); 
-        }
+
+
+
+    function onSelect() {      
+
+
+loader.load(
+  "https://sanu-hit.github.io/AR_TEST/coffee_table_round_01_4k.gltf",
+  (gltf) => {
+    model = gltf.scene; // Store the loaded model
+    model.scale.set(0.2, 0.2, 0.2); // Set initial scale
+  },
+  undefined,
+  (error) => {
+    console.error("Error loading GLTF model:", error);
+  }
+);
+
+if (reticle.visible && model) {
+  // Clone the loaded model to create a new instance
+  const newModel = model.clone();
+
+  // Set the position and rotation of the model based on the reticle
+  newModel.position.setFromMatrixPosition(reticle.matrix);
+  newModel.quaternion.setFromRotationMatrix(reticle.matrix);
+
+  // Add the model to the scene
+  scene.add(newModel);
+}
+
+
+        // if (reticle.visible) {
+        //   // cone added at the point of a hit test
+        //   // replace the next lines to add your own object in space
+        //   const geometry = new THREE.CylinderBufferGeometry(0, 0.05, 0.2, 32);
+        //   const material = new THREE.MeshPhongMaterial({
+        //     color: 0xffffff * Math.random()
+        //   });
+        //   const mesh = new THREE.Mesh(geometry, material);
+          
+        //   // set the position of the cylinder based on where the reticle is          
+        //   mesh.position.setFromMatrixPosition(reticle.matrix);
+        //   mesh.quaternion.setFromRotationMatrix(reticle.matrix);
+
+        //   scene.add(mesh); 
+        // }
       }
 
 
