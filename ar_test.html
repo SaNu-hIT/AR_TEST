@@ -5,58 +5,45 @@
     <title>WebXR AR Example</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* Toast Notification Styles */
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #start-ar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            padding: 10px;
+        }
         .toast {
             position: fixed;
-            top: 10px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px;
-            background-color: #333;
-            color: #fff;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
             border-radius: 5px;
-            font-size: 14px;
             display: none;
-            z-index: 1000;
         }
     </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
+<body>
 
-<button id="start-ar" style="position: absolute; top: 10px; left: 10px; z-index: 10; padding: 10px;">
-    Start AR
-</button>
-
+<button id="start-ar">Start AR</button>
 <div id="toast" class="toast"></div>
 
 <script>
-let scene, camera, renderer, controller, reticle, referenceSpace, hitTestSource;
+let scene, camera, renderer, controller, reticle;
+const toast = document.getElementById('toast');
 
-function showToast(message, duration = 3000) {
-    const toast = document.getElementById("toast");
-    toast.innerText = message;
-    toast.style.display = "block";
+function showToast(message) {
+    toast.textContent = message;
+    toast.style.display = 'block';
     setTimeout(() => {
-        toast.style.display = "none";
-    }, duration);
-}
-
-function checkCameraPermissions() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                showToast("Camera access granted.");
-                // Proceed with initializing AR
-                startARSession();
-            })
-            .catch(function(error) {
-                console.error("Camera access denied:", error);
-                showToast("Camera access denied. Please enable camera access for AR.", 5000);
-            });
-    } else {
-        console.error("getUserMedia not supported.");
-        showToast("Camera access not supported on this device.", 5000);
-    }
+        toast.style.display = 'none';
+    }, 3000);
 }
 
 function initialize() {
@@ -88,51 +75,40 @@ function initialize() {
     renderer.setAnimationLoop(render);
 }
 
-async function startARSession() {
-    if (!navigator.xr) {
-        alert("WebXR not supported on this browser.");
-        showToast("WebXR not supported on this browser.", 5000);
-        return;
-    }
-
-    try {
-        console.log("Requesting AR session...");
-        showToast("Requesting AR session...");
-        const xrSession = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test', 'local'] });
-        renderer.xr.setSession(xrSession);
-
-        xrSession.addEventListener('end', onSessionEnd);
-        referenceSpace = await xrSession.requestReferenceSpace('local');
-
-        hitTestSource = await xrSession.requestHitTestSource({
-            space: await xrSession.requestReferenceSpace('viewer'),
+function startARSession() {
+    if (navigator.xr) {
+        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+            if (supported) {
+                navigator.xr.requestSession('immersive-ar', { optionalFeatures: ['hit-test'] })
+                    .then((session) => {
+                        renderer.xr.setSession(session);
+                        showToast("AR Session Started");
+                        initialize();
+                    })
+                    .catch((err) => {
+                        console.error("Failed to start AR session:", err);
+                        showToast("Failed to start AR session. Please check your device compatibility.");
+                    });
+            } else {
+                console.error("WebXR immersive-ar session is not supported on this device.");
+                showToast("AR is not supported on this device.");
+            }
         });
-
-        initializeScene();
-        renderer.setAnimationLoop(render);
-        showToast("AR session started successfully.");
-        document.getElementById('start-ar').style.display = 'none';
-    } catch (err) {
-        console.error("Failed to start AR session:", err);
-        showToast("Failed to start AR session. Please check your device compatibility.", 5000);
+    } else {
+        console.error("WebXR API not available.");
+        showToast("WebXR API is not available on this browser.");
     }
-}
-
-function onSessionEnd() {
-    renderer.xr.getSession().end();
-    document.getElementById('start-ar').style.display = 'block';
-    showToast("AR session ended.");
 }
 
 function render(timestamp, frame) {
     if (frame) {
         const referenceSpace = renderer.xr.getReferenceSpace();
-        const hitTestSourceResult = frame.getHitTestResults(hitTestSource)[0];
+        const hitTestSource = frame.getHitTestResults(referenceSpace)[0];
 
-        if (hitTestSourceResult) {
-            const hitPose = hitTestSourceResult.getPose(referenceSpace);
+        if (hitTestSource) {
+            const hit = hitTestSource.getPose(referenceSpace);
             reticle.visible = true;
-            reticle.matrix.fromArray(hitPose.transform.matrix);
+            reticle.matrix.fromArray(hit.transform.matrix);
         } else {
             reticle.visible = false;
         }
@@ -140,10 +116,9 @@ function render(timestamp, frame) {
     renderer.render(scene, camera);
 }
 
-// Add event listener for user interaction
-document.getElementById('start-ar').addEventListener('click', function() {
-    checkCameraPermissions(); // Call this function when the user clicks the 'Start AR' button
-    initialize();
+document.getElementById('start-ar').addEventListener('click', () => {
+    startARSession();
+    document.getElementById('start-ar').style.display = 'none'; // Hide the button after starting AR
 });
 </script>
 
