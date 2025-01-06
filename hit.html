@@ -96,7 +96,7 @@ loader.load(
   },
   undefined,
   (error) => {
-     alert("Failed to load the 3D model. Please check the file URL or your internet connection.");
+     alert("Failed to load the 3D model. Please check the file URL or your internet connection.",error);
  
     console.error("Error loading GLTF model:", error);
   }
