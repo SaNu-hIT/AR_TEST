@@ -19,7 +19,7 @@
       let container;
       let camera, scene, renderer;
       let reticle;
-
+      let controller;
       init();
       animate();
 
@@ -41,6 +41,10 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.xr.enabled = true;
         container.appendChild(renderer.domElement);
+
+
+           controller = renderer.xr.getController(0);
+        controller.addEventListener('select', onSelect);
 
         var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
         light.position.set(0.5, 1, 0.25);
@@ -71,27 +75,31 @@
         reticle.visible = false; // we start with the reticle not visible
         scene.add(reticle);
 
-        renderer.domElement.addEventListener("click", onReticleClick, false);
-
+      
         // optional axis helper you can add to an object
         // reticle.add(new THREE.AxesHelper(1));
       }
 
 
 
-function onReticleClick(event) {
-  if (!reticle.visible) return; // Only add box if the reticle is visible
+    function onSelect() {        
+        if (reticle.visible) {
+          // cone added at the point of a hit test
+          // replace the next lines to add your own object in space
+          const geometry = new THREE.CylinderBufferGeometry(0, 0.05, 0.2, 32);
+          const material = new THREE.MeshPhongMaterial({
+            color: 0xffffff * Math.random()
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          
+          // set the position of the cylinder based on where the reticle is          
+          mesh.position.setFromMatrixPosition(reticle.matrix);
+          mesh.quaternion.setFromRotationMatrix(reticle.matrix);
 
-  // Create a box at the reticle's position
-  const boxGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2); // Initial size
-  const boxMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-  const box = new THREE.Mesh(boxGeometry, boxMaterial);
+          scene.add(mesh); 
+        }
+      }
 
-  // Set the box position to the reticle's position
-  box.position.setFromMatrixPosition(reticle.matrix);
-  scene.add(box);
-
-}
 
       function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
