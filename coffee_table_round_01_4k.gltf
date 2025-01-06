@@ -1,6 +1,6 @@
 {
   "asset": {
-    "generator": "Khronos glTF Blender I/O v1.6.16",
+    "generator": "Khronos glTF Blender I/O v1.7.33",
     "version": "2.0"
   },
   "scene": 0,
@@ -15,13 +15,13 @@
   "nodes": [
     {
       "mesh": 0,
-      "name": "coffee_table_round_01"
+      "name": "modern_coffee_table_01"
     }
   ],
   "materials": [
     {
       "doubleSided": true,
-      "name": "coffee_table_round_01",
+      "name": "modern_coffee_table_01",
       "normalTexture": {
         "index": 0
       },
@@ -29,6 +29,7 @@
         "baseColorTexture": {
           "index": 1
         },
+        "metallicFactor": 0,
         "metallicRoughnessTexture": {
           "index": 2
         }
@@ -37,7 +38,7 @@
   ],
   "meshes": [
     {
-      "name": "Plane.001",
+      "name": "Cube.003",
       "primitives": [
         {
           "attributes": {
@@ -68,76 +69,76 @@
   "images": [
     {
       "mimeType": "image/jpeg",
-      "name": "coffee_table_round_01_nor_gl.png",
-      "uri": "textures/coffee_table_round_01_nor_gl_4k.jpg"
+      "name": "modern_coffee_table_01_nor_gl",
+      "uri": "textures/modern_coffee_table_01_nor_gl_4k.jpg"
     },
     {
       "mimeType": "image/jpeg",
-      "name": "coffee_table_round_01_diff.png",
-      "uri": "textures/coffee_table_round_01_diff_4k.jpg"
+      "name": "modern_coffee_table_01_diff",
+      "uri": "textures/modern_coffee_table_01_diff_4k.jpg"
     },
     {
       "mimeType": "image/jpeg",
-      "name": "coffee_table_round_01_metal.png-coffee_table_round_01_rough.png",
-      "uri": "textures/coffee_table_round_01_arm_4k.jpg"
+      "name": "modern_coffee_table_01_rough",
+      "uri": "textures/modern_coffee_table_01_rough_4k.jpg"
     }
   ],
   "accessors": [
     {
       "bufferView": 0,
       "componentType": 5126,
-      "count": 3339,
+      "count": 3995,
       "max": [
-        0.6506503820419312,
-        0.4896320104598999,
-        0.6506507992744446
+        0.3000001311302185,
+        0.3898848593235016,
+        0.601161003112793
       ],
       "min": [
-        -0.6506505608558655,
-        -0.0013774335384368896,
-        -0.6506507992744446
+        -0.2999998927116394,
+        -0.00011512637138366699,
+        -0.6006690263748169
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 3339,
+      "count": 3995,
       "type": "VEC3"
     },
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 3339,
+      "count": 3995,
       "type": "VEC2"
     },
     {
       "bufferView": 3,
       "componentType": 5123,
-      "count": 12132,
+      "count": 13512,
       "type": "SCALAR"
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 40068,
+      "byteLength": 47940,
       "byteOffset": 0
     },
     {
       "buffer": 0,
-      "byteLength": 40068,
-      "byteOffset": 40068
+      "byteLength": 47940,
+      "byteOffset": 47940
     },
     {
       "buffer": 0,
-      "byteLength": 26712,
-      "byteOffset": 80136
+      "byteLength": 31960,
+      "byteOffset": 95880
     },
     {
       "buffer": 0,
-      "byteLength": 24264,
-      "byteOffset": 106848
+      "byteLength": 27024,
+      "byteOffset": 127840
     }
   ],
   "samplers": [
@@ -148,8 +149,8 @@
   ],
   "buffers": [
     {
-      "byteLength": 131112,
-      "uri": "coffee_table_round_01.bin"
+      "byteLength": 154864,
+      "uri": "modern_coffee_table_01.bin"
     }
   ]
 }
