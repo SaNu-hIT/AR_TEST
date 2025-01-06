@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>WebXR AR Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+<button id="start-ar" style="position: absolute; top: 10px; left: 10px; z-index: 10; padding: 10px;">
+    Start AR
+</button>
+
+<script>
+let scene, camera, renderer, controller, reticle;
+
+function initialize() {
+    // Scene setup
+    scene = new THREE.Scene();
+
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+    scene.add(camera);
+
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.xr.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    // Light setup
+    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+    scene.add(light);
+
+    // Reticle for placing objects
+    const geometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    reticle = new THREE.Mesh(geometry, material);
+    reticle.matrixAutoUpdate = false;
+    reticle.visible = false;
+    scene.add(reticle);
+
+    renderer.setAnimationLoop(render);
+}
+
+const startARButton = document.getElementById('start-ar');
+startARButton.addEventListener('click', () => {
+    if (navigator.xr) {
+        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+            if (supported) {
+                navigator.xr.requestSession('immersive-ar', { optionalFeatures: ['hit-test'] })
+                    .then((session) => {
+                        renderer.xr.setSession(session);
+                        initializeScene();
+                    })
+                    .catch((err) => console.error("Failed to start AR session:", err));
+            } else {
+                console.error("WebXR immersive-ar session is not supported on this device.");
+                alert("AR is not supported on this device or browser.");
+            }
+        });
+    } else {
+        console.error("WebXR API not available.");
+        alert("WebXR API is not available on this browser.");
+    }
+});
+
+
+function render(timestamp, frame) {
+    if (frame) {
+        const referenceSpace = renderer.xr.getReferenceSpace();
+        const hitTestSource = frame.getHitTestResults(referenceSpace)[0];
+
+        if (hitTestSource) {
+            const hit = hitTestSource.getPose(referenceSpace);
+            reticle.visible = true;
+            reticle.matrix.fromArray(hit.transform.matrix);
+        } else {
+            reticle.visible = false;
+        }
+    }
+    renderer.render(scene, camera);
+}
+
+// Add event listener for user interaction
+document.getElementById('start-ar').addEventListener('click', () => {
+    startARSession();
+    initialize();
+    document.getElementById('start-ar').style.display = 'none'; // Hide the button after starting AR
+});
+</script>
+
+</body>
+</html>
