@@ -59,10 +59,8 @@
 				}
 			);
 
-			// document.body.appendChild(ARButton.createButton(renderer));
+			document.body.appendChild(ARButton.createButton(renderer));
 
-// startARSession()
- document.body.addEventListener('click', startARSession, { once: true });
 			window.addEventListener('resize', onWindowResize, false);
 		}
 
@@ -96,24 +94,7 @@
       }
     }
 
-  function startARSession() {
-            // Check if WebXR is available in the browser
-            if (navigator.xr) {
-                navigator.xr.requestSession('immersive-ar', {
-                    requiredFeatures: ['hit-test']  // Enable hit-test for placing models
-                }).then(function(session) {
-                    renderer.xr.setSession(session); // Start the AR session
-                    console.log("AR session started");
-
-                    // Optionally handle session events here
-                    session.addEventListener('end', onSessionEnd);
-                }).catch(function(err) {
-                    console.error("Error starting AR session:", err);
-                });
-            } else {
-                console.error("WebXR not available on this device.");
-            }
-        }
+	
 
 	</script>
 </body>
