@@ -102,7 +102,7 @@
         // reticle.add(new THREE.AxesHelper(1));
       }
     function onSelect() {    
-       if (!reticle.visible || isDragging) return
+       if (!reticle.visible) return
 
         // Remove the current object if it exists
         if (currentObject) {
