@@ -210,6 +210,11 @@ loader.load(
               reticle.visible = true;
               // Transform/move the reticle image to the hit test position
               reticle.matrix.fromArray(pose.transform.matrix);
+              // Update position of the dragged object
+              if (isDragging && currentObject) {
+                currentObject.position.setFromMatrixPosition(reticle.matrix);
+                currentObject.quaternion.setFromRotationMatrix(reticle.matrix);
+              }
             } else {
               reticle.visible = false;
             }
