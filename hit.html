@@ -18,7 +18,7 @@
       import { ARButton } from "https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js";
 
       let container;
-      let camera, scene, renderer;
+      let camera, scene,renderer,raycaster;
       let reticle;
       let controller;
       let loader;
@@ -32,7 +32,7 @@
         document.body.appendChild(container);
         loader = new THREE.GLTFLoader();
         scene = new THREE.Scene();
-
+        raycaster = new THREE.Raycaster();
         camera = new THREE.PerspectiveCamera(
           70,
           window.innerWidth / window.innerHeight,
@@ -49,6 +49,8 @@
 
            controller = renderer.xr.getController(0);
         controller.addEventListener('select', onSelect);
+        controller.addEventListener("selectstart", onDragStart);
+        controller.addEventListener("selectend", onDragEnd);
 
         var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
         light.position.set(0.5, 1, 0.25);
@@ -66,6 +68,19 @@
       }
 
 
+      function onDragStart(event) {
+        if (!currentObject) return;
+        // Use the raycaster to check if the object is intersected
+        raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+        const intersects = raycaster.intersectObject(currentObject, true);
+        if (intersects.length > 0) {
+          isDragging = true;
+        }
+      }
+
+      function onDragEnd() {
+        isDragging = false;
+      }
 
 
       function addReticleToScene() {
