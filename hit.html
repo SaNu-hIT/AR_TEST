@@ -23,6 +23,7 @@
       let controller;
       let loader;
       let model;
+      let currentObject = null; 
       init();
       animate();
 
@@ -85,14 +86,29 @@
         // optional axis helper you can add to an object
         // reticle.add(new THREE.AxesHelper(1));
       }
-    function onSelect() {      
+    function onSelect() {    
+        if (!reticle.visible) return; // Do nothing if reticle is not visible
+
+        // Remove the current object if it exists
+        if (currentObject) {
+          scene.remove(currentObject);
+          currentObject = null;
+        }
 loader.load(
   "https://raw.githubusercontent.com/SaNu-hIT/AR_TEST/refs/heads/main/ukipagtbw_tier_1.gltf",
   (gltf) => {
     model = gltf.scene; // Store the loaded model
     model.scale.set(1, 1, 1); // Set initial scale
      // alert("Success");
- 
+
+  // Clone the loaded model to create a new instance
+  const newModel = model.clone();
+  // Set the position and rotation of the model based on the reticle
+  newModel.position.setFromMatrixPosition(reticle.matrix);
+  newModel.quaternion.setFromRotationMatrix(reticle.matrix);
+  // Add the model to the scene
+  scene.add(newModel);
+  currentObject = newModel;
   },
   undefined,
   (error) => {
@@ -101,36 +117,8 @@ loader.load(
     console.error("Error loading GLTF model:", error);
   }
 );
-
-if (reticle.visible && model) {
-  // Clone the loaded model to create a new instance
-  const newModel = model.clone();
-
-  // Set the position and rotation of the model based on the reticle
-  newModel.position.setFromMatrixPosition(reticle.matrix);
-  newModel.quaternion.setFromRotationMatrix(reticle.matrix);
-
-  // Add the model to the scene
-  scene.add(newModel);
-}
-
-
-        // if (reticle.visible) {
-        //   // cone added at the point of a hit test
-        //   // replace the next lines to add your own object in space
-        //   const geometry = new THREE.CylinderBufferGeometry(0, 0.05, 0.2, 32);
-        //   const material = new THREE.MeshPhongMaterial({
-        //     color: 0xffffff * Math.random()
-        //   });
-        //   const mesh = new THREE.Mesh(geometry, material);
-          
-        //   // set the position of the cylinder based on where the reticle is          
-        //   mesh.position.setFromMatrixPosition(reticle.matrix);
-        //   mesh.quaternion.setFromRotationMatrix(reticle.matrix);
-
-        //   scene.add(mesh); 
-        // }
-      }
+      
+  }
 
 
       function onWindowResize() {
