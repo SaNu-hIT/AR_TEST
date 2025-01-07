@@ -88,12 +88,12 @@
         {
             "mimeType": "image/png",
             "name": "T_ukipagtbw_4K_N",
-            "uri": "Textures/T_ukipagtbw_4K_N.png"
+            "uri": "textures/T_ukipagtbw_4K_N.png"
         },
         {
             "mimeType": "image/png",
             "name": "T_ukipagtbw_4K_ORM",
-            "uri": "Textures/T_ukipagtbw_4K_ORM.png",
+            "uri": "textures/T_ukipagtbw_4K_ORM.png",
             "extras": {
                 "compression": "mask"
             }
@@ -101,12 +101,12 @@
         {
             "mimeType": "image/png",
             "name": "T_ukipagtbw_4K_B",
-            "uri": "Textures/T_ukipagtbw_4K_B.png"
+            "uri": "textures/T_ukipagtbw_4K_B.png"
         },
         {
             "mimeType": "image/png",
             "name": "T_ukipagtbw_4K_H",
-            "uri": "Textures/T_ukipagtbw_4K_H.png",
+            "uri": "textures/T_ukipagtbw_4K_H.png",
             "extras": {
                 "textureSlot": "HeightTexture",
                 "compression": "displacement"
