@@ -26,6 +26,7 @@
       let currentObject = null; 
       init();
       animate();
+      let isDragging = false;
 
       function init() {
         container = document.createElement("div");
@@ -51,6 +52,9 @@
         controller.addEventListener('select', onSelect);
         // controller.addEventListener("selectstart", onDragStart);
         // controller.addEventListener("selectend", onDragEnd);
+        renderer.domElement.addEventListener('touchstart', onTouchStart, false);
+renderer.domElement.addEventListener('touchmove', onTouchMove, false);
+renderer.domElement.addEventListener('touchend', onTouchEnd, false);
 
         var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
         light.position.set(0.5, 1, 0.25);
@@ -68,20 +72,33 @@
       }
 
 
-      function onDragStart(event) {
-        if (!currentObject) return;
-        // Use the raycaster to check if the object is intersected
-        raycaster.setFromCamera({ x: 0, y: 0 }, camera);
-        const intersects = raycaster.intersectObject(currentObject, true);
-        if (intersects.length > 0) {
-          isDragging = true;
-        }
-      }
 
-      function onDragEnd() {
-        isDragging = false;
-      }
+      function onTouchStart(event) {
+        alert("onTouchStart");
+  if (event.touches.length === 1) { // Single-finger touch
+    raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    if (intersects.length > 0) {
+      isDragging = true;
+      selectedModel = intersects[0].object;
+    }
+  }
+}
 
+function onTouchMove(event) {
+  alert("onTouchMove");
+  if (isDragging && selectedModel && event.touches.length === 1) {
+    raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+    const intersects = raycaster.intersectObject(reticle, true);
+    if (intersects.length > 0) {
+      const point = intersects[0].point;
+      selectedModel.position.copy(point);
+    }
+  }
+}
+
+
+  
 
       function addReticleToScene() {
         const geometry = new THREE.RingBufferGeometry(0.15, 0.2, 32).rotateX(
