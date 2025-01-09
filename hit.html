@@ -50,6 +50,7 @@
 
            controller = renderer.xr.getController(0);
         // controller.addEventListener('select', onSelect);
+         controller.addEventListener('touchstart', onTouchStart, false);
         // controller.addEventListener("selectstart", onDragStart);
         // controller.addEventListener("selectend", onDragEnd);
 //         renderer.domElement.addEventListener('touchstart', onTouchStart, false);
