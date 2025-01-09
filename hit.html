@@ -49,7 +49,7 @@
 
 
            controller = renderer.xr.getController(0);
-        controller.addEventListener('select', onSelect);
+        // controller.addEventListener('select', onSelect);
         // controller.addEventListener("selectstart", onDragStart);
         // controller.addEventListener("selectend", onDragEnd);
         renderer.domElement.addEventListener('touchstart', onTouchStart, false);
@@ -74,7 +74,6 @@ renderer.domElement.addEventListener('touchend', onTouchEnd, false);
 
 
       function onTouchStart(event) {
-        alert("onTouchStart");
   if (event.touches.length === 1) { // Single-finger touch
     raycaster.setFromCamera({ x: 0, y: 0 }, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
@@ -86,7 +85,6 @@ renderer.domElement.addEventListener('touchend', onTouchEnd, false);
 }
 
 function onTouchMove(event) {
-  alert("onTouchMove");
   if (isDragging && selectedModel && event.touches.length === 1) {
     raycaster.setFromCamera({ x: 0, y: 0 }, camera);
     const intersects = raycaster.intersectObject(reticle, true);
@@ -114,6 +112,7 @@ function onTouchMove(event) {
         reticle.visible = false; // we start with the reticle not visible
         scene.add(reticle);
 
+        onSelect();
       
         // optional axis helper you can add to an object
         // reticle.add(new THREE.AxesHelper(1));
