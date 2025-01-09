@@ -49,8 +49,10 @@
 
 
            controller = renderer.xr.getController(0);
-        // controller.addEventListener('select', onSelect);
+     
+         controller.addEventListener('select', onSelect);
          controller.addEventListener('touchstart', onTouchStart, false);
+          controller.addEventListener('touchmove', onTouchMove, false);
         // controller.addEventListener("selectstart", onDragStart);
         // controller.addEventListener("selectend", onDragEnd);
 //         renderer.domElement.addEventListener('touchstart', onTouchStart, false);
@@ -112,9 +114,6 @@ function onTouchMove(event) {
         reticle.matrixAutoUpdate = false;
         reticle.visible = false; // we start with the reticle not visible
         scene.add(reticle);
-
-        onSelect();
-      
         // optional axis helper you can add to an object
         // reticle.add(new THREE.AxesHelper(1));
       }
