@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/TransformControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@1.0.0/dist/motion-controllers.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
         #ar-button {
@@ -16,7 +15,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            background-color: #4CAF50; /* Green */
+            background-color: #4CAF50;
             border: none;
             color: white;
             text-align: center;
@@ -24,7 +23,7 @@
             display: inline-block;
             font-size: 16px;
             cursor: pointer;
-            z-index: 1000; /* Ensure button is on top */
+            z-index: 1000;
         }
     </style>
 </head>
@@ -36,11 +35,11 @@
         let hitTestSource = null;
 
         async function init(event) {
-            event.target.disabled = true; // Disable button immediately
+            event.target.disabled = true;
 
             if (!navigator.xr) {
                 alert("WebXR not supported. This experience requires a WebXR-compatible device and browser.");
-                event.target.disabled = false; //Re-enable the button
+                event.target.disabled = false;
                 return;
             }
 
@@ -49,8 +48,49 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.xr.enabled = true;
+            renderer.xr.enabled = true; // This is crucial
             document.body.appendChild(renderer.domElement);
+
+            // Set up XR if available
+            if (renderer.xr.enabled) {
+                try {
+
+                    xrSession = await navigator.xr.requestSession('immersive-ar', {
+                        requiredFeatures: ['hit-test'],
+                        optionalFeatures: ['dom-overlay', 'local-floor', 'bounded-reference-space']
+                    });
+                    renderer.xr.setSession(xrSession);
+
+                    xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, renderer.getContext()) });
+
+                    const referenceSpace = await xrSession.requestReferenceSpace('local');
+                    renderer.xr.setReferenceSpace(referenceSpace);
+
+                    hitTestSource = await xrSession.requestHitTestSource({ space: referenceSpace });
+
+                    xrSession.addEventListener('select', onSelect);
+
+                    controller = renderer.xr.getController(0);
+                    scene.add(controller);
+
+                    transformControl = new THREE.TransformControls(camera, renderer.domElement);
+                    transformControl.addEventListener('change', render);
+                    transformControl.addEventListener('dragging-changed', function (event) {
+                        controller.enabled = !event.value;
+                    });
+                    scene.add(transformControl);
+
+                } catch (error) {
+                    console.error("Error initializing XR:", error);
+                    alert("Error initializing XR: " + error.message);
+                    event.target.disabled = false;
+                    return;
+                }
+            } else {
+                alert("WebXR is not available in this browser.");
+                event.target.disabled = false;
+                return;
+            }
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
@@ -66,40 +106,6 @@
             reticle.matrixAutoUpdate = false;
             reticle.visible = false;
             scene.add(reticle);
-
-            try {
-                xrSession = await navigator.xr.requestSession('immersive-ar', {
-                    requiredFeatures: ['hit-test'],
-                    optionalFeatures: ['dom-overlay', 'local-floor', 'bounded-reference-space']
-                });
-                renderer.xr.setSession(xrSession);
-
-                xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, renderer.getContext()) });
-
-                const referenceSpace = await xrSession.requestReferenceSpace('local');
-                renderer.xr.setReferenceSpace(referenceSpace);
-
-                hitTestSource = await xrSession.requestHitTestSource({ space: referenceSpace });
-
-                xrSession.addEventListener('select', onSelect);
-
-                controller = renderer.xr.getController(0);
-                scene.add(controller);
-
-                transformControl = new THREE.TransformControls(camera, renderer.domElement);
-                transformControl.addEventListener('change', render);
-                transformControl.addEventListener('dragging-changed', function (event) {
-                    controller.enabled = !event.value;
-                });
-                scene.add(transformControl);
-
-                window.addEventListener('resize', onWindowResize);
-            } catch (error) {
-                console.error("Error initializing XR:", error);
-                alert("WebXR not supported or not enabled. Check your browser and device. Error: " + error.message);
-                event.target.disabled = false; //Re-enable the button
-                return;
-            }
         }
 
         function onSelect() {
