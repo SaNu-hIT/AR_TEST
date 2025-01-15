@@ -46,7 +46,7 @@
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, xrCompatible: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.xr.enabled = true; // This is crucial
             document.body.appendChild(renderer.domElement);
