@@ -6,8 +6,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/TransformControls.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@1.0.0/dist/motion-controllers.umd.js"></script>
-
     <style>
         body { margin: 0; overflow: hidden; }
         #ar-button {
@@ -39,7 +37,7 @@
             event.target.disabled = true;
 
             if (!navigator.xr) {
-                alert("WebXR not supported. This experience requires a WebXR-compatible device and browser.");
+                alert("WebXR not supported.");
                 event.target.disabled = false;
                 return;
             }
@@ -57,9 +55,19 @@
                     requiredFeatures: ['hit-test'],
                     optionalFeatures: ['dom-overlay', 'local-floor', 'bounded-reference-space']
                 });
+
                 renderer.xr.setSession(xrSession);
 
-                xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, renderer.getContext()) });
+                const gl = renderer.getContext();
+                if (!gl.makeXRCompatible) {
+                    alert("Your browser does not support required WebXR features (makeXRCompatible).");
+                    event.target.disabled = false;
+                    xrSession.end();
+                    return;
+                }
+                await gl.makeXRCompatible();
+
+                xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, gl) });
 
                 const referenceSpace = await xrSession.requestReferenceSpace('local');
                 renderer.xr.setReferenceSpace(referenceSpace);
