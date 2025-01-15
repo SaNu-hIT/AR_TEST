@@ -10,20 +10,37 @@
     <script src="https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
+        #ar-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1000; /* Ensure button is on top */
+        }
     </style>
 </head>
 <body>
+    <button id="ar-button">Start AR</button>
     <script>
         let scene, camera, renderer, xrSession, controller, reticle, model, transformControl;
         let isPlacing = false;
         let hitTestSource = null;
 
-        init();
-        animate();
+        async function init(event) {
+            event.target.disabled = true; // Disable button immediately
 
-        async function init() {
             if (!navigator.xr) {
                 alert("WebXR not supported. This experience requires a WebXR-compatible device and browser.");
+                event.target.disabled = false; //Re-enable the button
                 return;
             }
 
@@ -80,6 +97,7 @@
             } catch (error) {
                 console.error("Error initializing XR:", error);
                 alert("WebXR not supported or not enabled. Check your browser and device. Error: " + error.message);
+                event.target.disabled = false; //Re-enable the button
                 return;
             }
         }
@@ -132,6 +150,9 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
+
+        const arButton = document.getElementById('ar-button');
+        arButton.addEventListener('click', init);
     </script>
 </body>
 </html>
